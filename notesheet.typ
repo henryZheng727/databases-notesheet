@@ -19,6 +19,8 @@
 
 #show raw.where(block: true): set align(center)
 
+#show math.equation.where(block: false): set math.frac(style: "skewed")
+
 #show raw.where(block: false): box.with(
   fill: luma(240),
   inset: (x: 2pt, y: 0pt),
@@ -78,3 +80,41 @@
     + `SET NULL`: nullify the foreign key
     + `RESTRICT`: disallow changes to the referenced table
 #colbreak()
+
+== Relational Algebra
+*Basic Operators*
+1. Projection: $pi_"column list" ("relation")$ returns columns from a relation.
+2. Selection: $sigma_"condition" ("relation")$ filters rows on a condition.
+3. Cross Product: $A times B$ produces all combinations of tuples from $A$ and $B$ (like `JOIN` in SQL).
+4. Set Union: $A union B$ produces a table with all tuples in either $A$ or $B$.
+  + Must be _union compatible_: same number of columns, and corresponding columns have same type and name.
+5. Set Difference: $A - B$ produces a relation with all instances in $A$ that are not in $B$. $A$ and $B$ must be union compatible.
+  + Note that we can compose $A inter B = A - (A - B) = B - (B - A)$.
+
+*Joins*
+1. Theta Join: $A join_"condition" B$ is a shortcut for $sigma_"condition" (A times B)$.
+  + It is essentially the same as a `... JOIN ... ON` in SQL.
+  + The output schema is the same as $A times B$.
+2. Natural Join: $A join B$ selects all rows from $A times B$ where common attributes have equal values.
+  + It is essentially the same as a `NATURAL JOIN` in SQL.
+  + The output schema only has _one_ copy of the common attributes.
+
+*Renaming*
+1. We can rename a _relation_ with $rho("newName", "expression")$.
+2. We can rename _columns_ with
+$
+  rho("newName"_("newCol1" \/ "oldCol1", "newCol2" \/ "oldCol2"), X)
+$
+...which may be useful for making relations union compatible.
+
+*Division*
+- Let $"schema"(B) subset.eq "schema"(A)$. Define $A / B$ such that
+  - $"schema"(A / B) union "schema"(B) = "schema"(A)$
+  - $A / B$ finds all $x$ such that $forall y in B space exists (x, y) in A$
+  - Suppose $"schema"(A) = {x, y}$ and $"schema"(B) = y$. Then
+  $
+    A \/ B = pi_x (A) - pi_x ((pi_x (A) times B) - A)
+  $
+
+== Advanced Queries
+
