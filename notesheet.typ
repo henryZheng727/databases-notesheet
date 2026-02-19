@@ -213,20 +213,13 @@ SELECT [DISTINCT] <target-list> FROM <relation-list>
 
 *Renaming*
 1. We can rename a _relation_ with $rho("newName", "expression")$.
-2. We can rename _columns_ with
-$
-  rho("newName"_("newCol1" \/ "oldCol1", "newCol2" \/ "oldCol2"), X)
-$
-...which may be useful for making relations union compatible.
+2. To make relations union compatible, we can rename _columns_ with $rho("newName"_("newCol1" \/ "oldCol1", "newCol2" \/ "oldCol2"), X)$.
 
 *Division*
 - Let $"schema"(B) subset.eq "schema"(A)$. Define $A / B$ such that
   - $"schema"(A / B) union "schema"(B) = "schema"(A)$
   - $A / B$ finds all $x$ such that $forall y in B space exists (x, y) in A$
-  - Suppose $"schema"(A) = {x, y}$ and $"schema"(B) = y$. Then
-  $
-    A \/ B = pi_x (A) - pi_x ((pi_x (A) times B) - A)
-  $
+  - Suppose $"schema"(A) = {x, y}$ and $"schema"(B) = y$. Then \ $A \/ B = pi_x (A) - pi_x ((pi_x (A) times B) - A)$
 
 == Advanced Queries
 *Key Refinement*
