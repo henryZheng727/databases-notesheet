@@ -93,6 +93,9 @@
 
 - _"IS-A"_: Use a triangle to denote that one entity "is a" different entity.
 - _Ternary Relationship_: it may occasionally be useful for a relationship to involve three, rather than two, entities. Draw a line connecting all three.
+// TODO: #image("mod02_er_basics.pdf") // add a picture from Lec3 showing cardinality labels (1/M) and double-line participation
+- _Cardinality_ labels go on the opposite edge (1/M).
+- _Double line_: total participation (must participate $>=$ 1 time).
 
 *ER Diagrams - Weak Entities*
 - A _weak entity_ is defined by its own attributes and _another_ entity's key.
@@ -108,13 +111,14 @@
   + Some columns might be _merged_ - see below. _Underlined_ columns are part of the primary key. _Red_ columns are a foreign key.
   #image("mod02_er_to_schema.pdf")
 
-- Participation
+- Participation: total on FK side ⇒ `NOT NULL`; else FK may be `NULL`
+- 1-1: FK must be `UNIQUE`; if one side total, put FK there (`NOT NULL`)
+- Weak: `Weak(ownerFK, partialKey, ...)`, PK=`(ownerFK, partialKey)`; ownerFK `NOT NULL`
+- Double-total not in pure schema: circular `NOT NULL` FKs ⇒ insert deadlock; enforce manually
+- IS-A: `Base(pk,...)` + `Sub(pk PK/FK,...)` (or subtype-only tables if base abstract)
 
 
 == Intro to SQL
-*Query By Instance*
-- Writing a query using specific knowledge of the table contents.
-  - _Do not_ do this; your queries may break if the table changes.
 
 *SQL Types*
 1. _Numeric_: integers (`int`, `tinyint`, `smallint`, `mediumint`, `bigint`) and reals (`float`, `double`, `decimal`). Can be `unsigned`.
