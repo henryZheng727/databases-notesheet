@@ -164,7 +164,7 @@ ON DELETE <action> ON UPDATE <action>
 *Altering Tables*
 1. Add column. `ALTER TABLE <table> ADD <column>` (creation format).
 2. Change column. `ALTER TABLE <table> MODIFY <column> <newtype>`.
-3. Add FK. `ALTER TABLE <table> ADD FOREIGN KEY(columns) REFERENCES<table>(columns)`.
+3. Add FK. `ALTER TABLE <table> ADD FOREIGN KEY(columns) REFERENCES<table>(columns)`. // todo fix
 4. Drop PK. `ALTER TABLE <table> DROP PRIMARY KEY`.
 5. Add PK. `ALTER TABLE <table> ADD PRIMARY KEY(<columns>)`.
 
@@ -197,7 +197,7 @@ SELECT [DISTINCT] <target-list> FROM <relation-list>
 *Basic Operators*
 1. Projection: $pi_"column list" ("relation")$ returns columns from a relation.
 2. Selection: $sigma_"condition" ("relation")$ filters rows on a condition.
-3. Cross Product: $A times B$ produces all combinations of tuples from $A$ and $B$ (like `JOIN` in SQL).
+3. Cross Product: $A times B$ returns all combinations of tuples from $A$ and $B$.
 4. Set Union: $A union B$ produces a table with all tuples in either $A$ or $B$.
   + Must be _union compatible_: same number of columns, and corresponding columns have same type and name.
 5. Set Difference: $A - B$ produces a relation with all instances in $A$ that are not in $B$. $A$ and $B$ must be union compatible.
@@ -229,4 +229,63 @@ $
   $
 
 == Advanced Queries
+*Key Refinement*
+- Rule of Thumb: if your PK is compound or not an integer,
+  - Convert it to `UNIQUE` and add a new "ID" primary key (of integer type)
 
+*Relational Algebra to SQL*
+1. Projection: $pi_("col1", ...) ->$ `SELECT col1, ...`
+  + If the RA query has no projection, use `SELECT *`
+2. Selection: $sigma_("condition") ->$ `WHERE condition`
+3. Renaming: // todo
+4. Cross Product:
+  + $A times B ->$ `A JOIN B`
+  + $A join B ->$ `A NATURAL JOIN B`
+  + $A join_"condition" B ->$ `A JOIN B WHERE condition`
+5. Union: $A union B ->$ `SELECT * FROM A UNION SELECT * FROM B`
+  + Note that by SQL syntax, you _must_ have select statements on both sides of the union. You can't directly union two relations.
+  + You _can_ (but shouldn't) union relations that aren't union-compatible.
+  + You can use `UNION ALL` to allow duplicates.
+6. Intersect: if schemas are the same, `NATURAL JOIN` is the same as $inter$.
+  + Can be formulated with `IN` (rows where $x$ is in nested query).
+  + `SELECT X FROM A WHERE X IN (SELECT X FROM B)`
+7. Set Difference: identical to intersection, but use `NOT IN`.
+
+*Outer Join*
+- `X LEFT JOIN Y ON condition` will give all rows where condition is true, and all rows from $X$ (even if the condition is not met).
+  - Unmatched tuples get `NULL` in right-side columns.
+  - Use `NATURAL LEFT JOIN` for only one copy of equivalent columns.
+  - You can symmetrically `RIGHT JOIN` to get all rows from $Y$.
+
+*Advanced Data*
+- `NULL`: `NULL` is not a value in SQL, it represents an "unknown". Therefore, all normal operators on `NULL` return `NULL`.
+  - Use the `IS` keyword to check whether something is null.
+  - The `COALESCE` function returns the first non-null argument, and is used to give default values to potential `NULL`s.
+- String Operations
+  - SQL supports a regex-like syntax. `_` matches one character; `%` matches $0$ or more arbitrary characters.
+- Dates
+  - We can use normal comparisons/operators on `DATE` and `DATETIME`.
+  - `YEAR()`, `MONTH()`, and `DAY()` functions to extract from a date.
+  - Many convenience functions; e.g., `timestampdiff` diffs dates.
+
+*Aggregate Functions*
+- An _aggregate function_ returns a single number on a multiset (usually used on a single column). `COUNT`, `MAX`, `MIN`, `SUM`, `AVG`, ...
+- `GROUP BY` gives _one representative row_ for each group in the column.
+  - Usually used with aggregate functions, as aggregate functions are applied on each group _separately_.
+  - Example: `SELECT Major, COUNT(*) FROM Students GROUP BY Major` counts the number of people in each major.
+- `HAVING`
+  1. `WHERE` is used _before_ `GROUP BY` to filter rows.
+  2. `HAVING` is used _after_ `GROUP BY` to filter _groups_.
+    + This lets you use the result of aggregate functions in a condition.
+- Aggregate functions don't return a row, they aggregate a group into one value. Be careful not to select the data from the representative row instead of the overall group (use a `JOIN` instead).
+- If you want to aggregate several groups (e.g., average GPA of a major), make it a nested query (you can't directly aggregate groups).
+
+*Case*
+
+*Deletion and Insertion*
+
+*Multiset Operators*
+
+*Nested Loop Operations*
+
+*Set Division*
